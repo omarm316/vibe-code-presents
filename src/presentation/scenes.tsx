@@ -65,6 +65,7 @@ const practicalColumns = [
     prompt: "Create an interactive theme park game with paths, rides, guests, UI...",
     project: "March Yakness Bracket Site",
     assetSrc: "/assets/slide-9-march-yakness.png",
+    qrSrc: "/assets/slide-9-march-yakness-qr.svg",
     assetLabel: "March Yakness Bracket Site",
     assetCaption: "Bracket site example"
   },
@@ -73,6 +74,7 @@ const practicalColumns = [
     prompt: "Write a detailed product spec for an interactive theme park game... Ask me about key decisions similar products don't agree on.",
     project: "Pong Rush Game",
     assetSrc: "/assets/slide-9-pong-rush.png",
+    qrSrc: "/assets/slide-9-pong-rush-qr.svg",
     assetLabel: "Pong Rush Game",
     assetCaption: "Game example"
   },
@@ -81,6 +83,7 @@ const practicalColumns = [
     prompt: "Prompt 1: product spec\nPrompt 2: before building, plan structure, docs, consistency",
     project: "Internal Monitoring Tool",
     assetSrc: "/assets/slide-9-monitoring-tool.png",
+    qrSrc: undefined,
     assetLabel: "Internal Monitoring Tool",
     assetCaption: "Operational tool example"
   },
@@ -89,6 +92,7 @@ const practicalColumns = [
     prompt: "Prompt 1: product spec\nPrompt 2: planning docs + system rules",
     project: "Lift & Learn App",
     assetSrc: "/assets/slide-9-lift-and-learn.png",
+    qrSrc: undefined,
     assetLabel: "Lift & Learn App",
     assetCaption: "Learning product example"
   }
@@ -734,13 +738,14 @@ function SceneNine({ localStage }: SceneRenderProps) {
           const isFocused = isFocusStage && index === practicalColumns.length - 1;
           const isFaded = isFocusStage && index !== practicalColumns.length - 1;
 
-          return (
-            <motion.div
-              key={column.label}
-              className={[
-                "approach-column",
-                isFocused ? "approach-column-focused" : ""
-              ].join(" ")}
+	          return (
+	            <motion.div
+	              key={column.label}
+	              className={[
+	                "approach-column",
+	                column.qrSrc ? "approach-column-has-qr" : "",
+	                isFocused ? "approach-column-focused" : ""
+	              ].join(" ")}
               animate={{
                 opacity: isFaded ? 0.08 : 1,
                 x: isFocused ? (isPromptStage ? 244 : 124) : isFaded ? -40 : 0,
@@ -751,42 +756,60 @@ function SceneNine({ localStage }: SceneRenderProps) {
               transition={{ duration: 0.58, ease: CAMERA_EASE }}
             >
               <div className="approach-column-sheen" />
-              <Reveal
-                show={localStage >= 2}
-                className="approach-label"
-                delay={index * 0.06}
-              >
-                {column.label}
-              </Reveal>
+              <div className="approach-meta">
+                <Reveal
+                  show={localStage >= 2}
+                  className="approach-label"
+                  delay={index * 0.06}
+                >
+                  {column.label}
+                </Reveal>
 
-              <Reveal
-                show={localStage === 3 || localStage === 4}
-                className="approach-copy"
-                delay={index * 0.06}
-              >
-                {column.prompt}
-              </Reveal>
+                <Reveal
+                  show={localStage === 3 || localStage === 4}
+                  className="approach-copy"
+                  delay={index * 0.06}
+                >
+                  {column.prompt}
+                </Reveal>
 
-              <Reveal
-                show={isProjectStage}
-                className="approach-project"
-                delay={index * 0.06}
-              >
-                {column.project}
-              </Reveal>
+                <Reveal
+                  show={isProjectStage}
+                  className="approach-project"
+                  delay={index * 0.06}
+                >
+                  {column.project}
+                </Reveal>
+
+	                {column.qrSrc ? (
+	                  <Reveal
+	                    show={isGalleryStage && localStage >= index + 7}
+	                    className="approach-qr"
+	                    delay={0.08}
+	                  >
+	                    <div className="approach-qr-frame">
+	                      <img
+	                        className="approach-qr-image"
+                        src={column.qrSrc}
+                        alt={`QR code for ${column.project}`}
+                      />
+                    </div>
+                  </Reveal>
+                ) : null}
+              </div>
 
               <Reveal
                 show={localStage >= index + 7}
                 className="approach-asset"
               >
-                <ImagePlaceholder
-                  src={column.assetSrc}
-                  alt={`${column.project} placeholder`}
-                  label={column.assetLabel}
-                  caption={column.assetCaption}
-                  ratio="16 / 10"
-                />
-              </Reveal>
+	                <ImagePlaceholder
+	                  src={column.assetSrc}
+	                  alt={`${column.project} placeholder`}
+	                  label={column.assetLabel}
+	                  caption={column.assetCaption}
+	                  ratio={isGalleryStage && column.qrSrc ? "16 / 11" : "16 / 10"}
+	                />
+	              </Reveal>
             </motion.div>
           );
         })}
