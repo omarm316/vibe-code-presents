@@ -2,6 +2,7 @@ node_modules/
 dist/
 .qa/
 .wrangler/
+.env
 
 *.tsbuildinfo
 .DS_Store
