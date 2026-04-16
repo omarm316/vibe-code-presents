@@ -239,8 +239,8 @@ select {
   position: absolute;
   left: 110px;
   right: 0;
-  top: 396px;
-  height: 220px;
+  top: 538px;
+  height: 172px;
 }
 
 .scene-one .sequence-row {
@@ -306,7 +306,7 @@ select {
 
 .reaction-card {
   position: absolute;
-  width: 260px;
+  width: 390px;
 }
 
 .reaction-card-small .image-fallback-label {
@@ -324,7 +324,7 @@ select {
 }
 
 .reaction-card-large {
-  width: 376px;
+  width: 564px;
 }
 
 .scene-two-visual {
@@ -700,6 +700,24 @@ select {
   align-items: stretch;
 }
 
+.approach-grid-projects {
+  left: 52px;
+  right: 52px;
+  top: 116px;
+  gap: 28px;
+  justify-content: center;
+}
+
+.approach-grid-gallery {
+  left: 60px;
+  right: 60px;
+  top: 86px;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: start;
+}
+
 .approach-column {
   position: relative;
   min-height: 508px;
@@ -755,6 +773,37 @@ select {
   line-height: 1.08;
 }
 
+.approach-grid-projects .approach-column {
+  min-height: 556px;
+}
+
+.approach-grid-projects .approach-project {
+  font-size: 38px;
+  line-height: 1.04;
+}
+
+.approach-grid-gallery .approach-column {
+  display: grid;
+  grid-template-columns: minmax(0, 208px) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 24px;
+  row-gap: 16px;
+  min-height: 322px;
+  padding: 28px;
+}
+
+.approach-grid-gallery .approach-label {
+  min-height: 0;
+  font-size: 34px;
+  line-height: 1.02;
+}
+
+.approach-grid-gallery .approach-project {
+  margin-top: 0;
+  font-size: 29px;
+  line-height: 1.06;
+}
+
 .approach-asset {
   position: absolute;
   left: 28px;
@@ -762,8 +811,22 @@ select {
   bottom: 28px;
 }
 
+.approach-grid-gallery .approach-asset {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
 .approach-asset .image-frame {
   border-radius: 22px;
+}
+
+.approach-grid-gallery .approach-asset .image-frame {
+  border-radius: 24px;
 }
 
 .approach-asset .image-fallback-label {
@@ -776,12 +839,16 @@ select {
   font-size: 12px;
 }
 
+.approach-grid-gallery .approach-asset .image-caption {
+  display: none;
+}
+
 .prompt-panel {
   position: absolute;
-  left: 760px;
-  top: 236px;
-  width: 760px;
-  padding: 28px 30px 30px;
+  left: 118px;
+  right: 118px;
+  top: 86px;
+  padding: 28px 30px 28px;
   border-radius: 34px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
@@ -817,23 +884,140 @@ select {
   font-size: 15px;
 }
 
-.prompt-panel-grid {
+.prompt-sequence {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
   gap: 18px;
 }
 
-.prompt-stack {
+.prompt-step {
+  position: relative;
+  padding: 20px 22px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.prompt-step-primary {
+  max-width: 820px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+}
+
+.prompt-step-secondary {
+  padding-top: 22px;
+  background:
+    linear-gradient(180deg, rgba(157, 214, 198, 0.1), rgba(255, 255, 255, 0.03) 20%),
+    rgba(255, 255, 255, 0.03);
+  border-color: rgba(157, 214, 198, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 24px 56px rgba(0, 0, 0, 0.22);
+}
+
+.prompt-step-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.prompt-step-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.06);
+  font-family: "Sora", sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.prompt-step-meta {
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prompt-step p,
+.prompt-list {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.prompt-step-intro {
+  margin-bottom: 14px;
+  max-width: 760px;
+}
+
+.prompt-sequence-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  padding: 0 6px;
+  color: var(--subtle);
+}
+
+.prompt-sequence-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 214, 198, 0.14);
+  background: rgba(157, 214, 198, 0.08);
+  color: rgba(219, 247, 239, 0.9);
+  font-size: 18px;
+}
+
+.prompt-sequence-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.prompt-step-children-label {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 214, 198, 0.12);
+  background: rgba(157, 214, 198, 0.06);
+  color: rgba(234, 244, 241, 0.88);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.prompt-panel-grid {
   display: grid;
-  gap: 14px;
-  align-content: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "create documents maintain"
+    "workflow workflow workflow";
+  gap: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(157, 214, 198, 0.1);
+  background: rgba(7, 12, 18, 0.36);
 }
 
 .prompt-section {
   padding: 18px 18px 16px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .prompt-section-title {
@@ -841,14 +1025,6 @@ select {
   font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-.prompt-section p,
-.prompt-list {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
 }
 
 .prompt-list {
@@ -860,8 +1036,27 @@ select {
   gap: 4px;
 }
 
-.prompt-reference .image-frame {
-  border-radius: 22px;
+.prompt-section-document-rules {
+  grid-area: documents;
+}
+
+.prompt-section-create {
+  grid-area: create;
+}
+
+.prompt-section-maintainability {
+  grid-area: maintain;
+}
+
+.prompt-section-workflow {
+  grid-area: workflow;
+}
+
+.prompt-section-workflow .prompt-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 20px;
+  padding-left: 18px;
 }
 
 .scene-ten-copy {

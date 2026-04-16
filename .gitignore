@@ -3,6 +3,8 @@ dist/
 .qa/
 .wrangler/
 .env
+.playwright-cli/
+output/
 
 *.tsbuildinfo
 .DS_Store

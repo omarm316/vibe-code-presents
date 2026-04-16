@@ -706,10 +706,30 @@ function SceneEight({ localStage }: SceneRenderProps) {
 function SceneNine({ localStage }: SceneRenderProps) {
   const isFocusStage = localStage === 4 || localStage === 5;
   const isProjectStage = localStage >= 6;
+  const isGalleryStage = localStage >= 7;
+  const isPromptStage = localStage === 5;
 
   return (
-    <div className="scene scene-nine">
-      <div className="approach-grid">
+    <div
+      className={[
+        "scene",
+        "scene-nine",
+        isProjectStage ? "scene-nine-projects" : "",
+        isGalleryStage ? "scene-nine-gallery" : "",
+        isPromptStage ? "scene-nine-prompt" : ""
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div
+        className={[
+          "approach-grid",
+          isProjectStage ? "approach-grid-projects" : "",
+          isGalleryStage ? "approach-grid-gallery" : ""
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {practicalColumns.map((column, index) => {
           const isFocused = isFocusStage && index === practicalColumns.length - 1;
           const isFaded = isFocusStage && index !== practicalColumns.length - 1;
@@ -723,10 +743,10 @@ function SceneNine({ localStage }: SceneRenderProps) {
               ].join(" ")}
               animate={{
                 opacity: isFaded ? 0.08 : 1,
-                x: isFocused ? 110 : isFaded ? -40 : 0,
-                y: isFocused ? -18 : 0,
-                scale: isFocused ? 1.06 : isFaded ? 0.94 : 1,
-                width: isFocused ? 420 : 280
+                x: isFocused ? (isPromptStage ? 244 : 124) : isFaded ? -40 : 0,
+                y: isFocused ? (isPromptStage ? -34 : -18) : 0,
+                scale: isFocused ? (isPromptStage ? 1.02 : 1.06) : isFaded ? 0.94 : 1,
+                width: isFocused ? (isPromptStage ? 560 : 520) : isGalleryStage ? 660 : isProjectStage ? 340 : 280
               }}
               transition={{ duration: 0.58, ease: CAMERA_EASE }}
             >
@@ -781,65 +801,66 @@ function SceneNine({ localStage }: SceneRenderProps) {
           <span className="prompt-goal">Goal: keep the system aligned as it evolves</span>
         </div>
 
-        <div className="prompt-panel-grid">
-          <div className="prompt-stack">
-            {slide9PromptColumns.map((column) => (
-              <div
-                className="prompt-section"
-                key={column.heading}
-              >
-                <div className="prompt-section-title">{column.heading}</div>
-                <p>{column.body}</p>
+        <div className="prompt-sequence">
+	          <div className="prompt-step prompt-step-primary">
+	            <div className="prompt-step-heading">
+	              <span className="prompt-step-badge">{slide9PromptColumns[0].heading}</span>
+	              <span className="prompt-step-meta">Step 1 of 2</span>
+	            </div>
+	            <p>{slide9PromptColumns[0].body}</p>
+	          </div>
+
+	          <div className="prompt-sequence-divider">
+	            <span className="prompt-sequence-arrow">↓</span>
+	            <span className="prompt-sequence-label">After Prompt 1, use Prompt 2 to define the system structure</span>
+	          </div>
+
+	          <div className="prompt-step prompt-step-secondary">
+	            <div className="prompt-step-heading">
+	              <span className="prompt-step-badge">{slide9PromptColumns[1].heading}</span>
+	              <span className="prompt-step-meta">Step 2 of 2</span>
+	            </div>
+	            <p className="prompt-step-intro">{slide9PromptColumns[1].body}</p>
+	            <div className="prompt-step-children-label">Prompt 2 should define all of the components below</div>
+
+	            <div className="prompt-panel-grid">
+              <div className="prompt-section prompt-section-create">
+                <div className="prompt-section-title">Create</div>
+                <ul className="prompt-list prompt-list-tight">
+                  {documentRules.map((documentRule) => (
+                    <li key={documentRule}>{documentRule}</li>
+                  ))}
+                </ul>
               </div>
-            ))}
 
-            <div className="prompt-section">
-              <div className="prompt-section-title">For each document</div>
-              <ul className="prompt-list">
-                <li>Define purpose</li>
-                <li>Define source of truth</li>
-                <li>Define when it must be updated</li>
-                <li>Define how it is used</li>
-              </ul>
+              <div className="prompt-section prompt-section-document-rules">
+                <div className="prompt-section-title">For each document</div>
+                <ul className="prompt-list">
+                  <li>Define purpose</li>
+                  <li>Define source of truth</li>
+                  <li>Define when it must be updated</li>
+                  <li>Define how it is used</li>
+                </ul>
+              </div>
+
+              <div className="prompt-section prompt-section-maintainability">
+                <div className="prompt-section-title">Maintainability rules</div>
+                <ul className="prompt-list prompt-list-tight">
+                  {maintainabilityRules.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="prompt-section prompt-section-workflow">
+                <div className="prompt-section-title">Workflow</div>
+                <ul className="prompt-list prompt-list-tight">
+                  {workflowRules.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-
-          <div className="prompt-stack">
-            <div className="prompt-section">
-              <div className="prompt-section-title">Create</div>
-              <ul className="prompt-list prompt-list-tight">
-                {documentRules.map((documentRule) => (
-                  <li key={documentRule}>{documentRule}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="prompt-section">
-              <div className="prompt-section-title">Maintainability rules</div>
-              <ul className="prompt-list prompt-list-tight">
-                {maintainabilityRules.map((rule) => (
-                  <li key={rule}>{rule}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="prompt-section">
-              <div className="prompt-section-title">Workflow</div>
-              <ul className="prompt-list prompt-list-tight">
-                {workflowRules.map((rule) => (
-                  <li key={rule}>{rule}</li>
-                ))}
-              </ul>
-            </div>
-
-            <ImagePlaceholder
-              src="/assets/slide-9-example.png"
-              alt="Slide 9 example placeholder"
-              label="System example image"
-              caption="Optional supporting visual"
-              ratio="16 / 9"
-              className="prompt-reference"
-            />
           </div>
         </div>
       </Reveal>
@@ -1233,7 +1254,7 @@ function getSlideOneEmotion(localStage: number) {
       alt: "Final meltdown placeholder",
       label: "Final meltdown meme",
       caption: "Everything is broken",
-      assetSrc: undefined
+      assetSrc: "/assets/slide-1-meltdown.png"
     };
   }
 
@@ -1246,7 +1267,7 @@ function getSlideOneEmotion(localStage: number) {
       alt: "Recovery placeholder",
       label: "Recovery beat",
       caption: "Trying to regain control",
-      assetSrc: undefined
+      assetSrc: "/assets/slide-1-recovery.png"
     };
   }
 
@@ -1259,7 +1280,7 @@ function getSlideOneEmotion(localStage: number) {
       alt: "Concern placeholder",
       label: "Concern beat",
       caption: "The first crack",
-      assetSrc: undefined
+      assetSrc: "/assets/slide-1-uh-oh.png"
     };
   }
 
@@ -1272,7 +1293,7 @@ function getSlideOneEmotion(localStage: number) {
       alt: "Confidence placeholder",
       label: "Confidence beat",
       caption: "Locked in",
-      assetSrc: undefined
+      assetSrc: "/assets/slide-1-locked-in.png"
     };
   }
 
@@ -1431,9 +1452,9 @@ export const scenes: SceneDefinition[] = [
     camera(localStage) {
       if (localStage === 5) {
         return {
-          x: 18880,
-          y: 1510,
-          zoom: 1.18
+          x: 18450,
+          y: 1496,
+          zoom: 0.98
         };
       }
 
@@ -1448,16 +1469,16 @@ export const scenes: SceneDefinition[] = [
       if (localStage >= 7) {
         return {
           x: 18450,
-          y: 1516,
-          zoom: 0.84
+          y: 1492,
+          zoom: 0.98
         };
       }
 
       if (localStage >= 6) {
         return {
           x: 18450,
-          y: 1502,
-          zoom: 0.88
+          y: 1498,
+          zoom: 0.94
         };
       }
 
