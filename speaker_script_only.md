@@ -190,3 +190,6 @@ You can direct the system instead of reacting to it.
 And you can build products, not just prototypes.
 
 That's the difference between something that works once and something you can actually build into a real product.
+
+Wrap up:
+I'm Assaf Packin. I build fast prototypes and MVPs, and I spend a lot of time thinking about how to turn the right ones into systems that can scale without falling apart.

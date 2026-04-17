@@ -323,3 +323,4 @@
 ### Post-slide note
 - Leave this slide on screen during Q&A.
 - Do not replace it with `Thank you` or `Questions?`
+- "I'm Assaf Packin. I build fast prototypes and MVPs, and I spend a lot of time thinking about how to turn the right ones into systems that can scale without falling apart."

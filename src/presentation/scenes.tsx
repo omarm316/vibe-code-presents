@@ -29,25 +29,23 @@ export type SceneDefinition = {
 
 type SequenceItem = {
   label: string;
-  x: number;
   y: number;
   tone: "stable" | "break";
   strength?: number;
-  width: number;
 };
 
 const sequenceItems: SequenceItem[] = [
-  { label: "Build", x: 56, y: 0, tone: "stable", width: 154 },
-  { label: "Fix", x: 226, y: 0, tone: "stable", width: 82 },
-  { label: "Add", x: 376, y: 0, tone: "stable", width: 100 },
-  { label: "Add", x: 516, y: 0, tone: "stable", width: 100 },
-  { label: "Fix", x: 664, y: 0, tone: "stable", width: 82 },
-  { label: "Add", x: 806, y: 0, tone: "stable", width: 100 },
-  { label: "Break", x: 966, y: -4, tone: "break", strength: 1, width: 166 },
-  { label: "Fix", x: 1144, y: 0, tone: "stable", width: 82 },
-  { label: "Break", x: 1298, y: 10, tone: "break", strength: 2, width: 166 },
-  { label: "Break", x: 1410, y: -12, tone: "break", strength: 3, width: 166 },
-  { label: "Break", x: 1512, y: 16, tone: "break", strength: 4, width: 166 }
+  { label: "Build", y: 0, tone: "stable" },
+  { label: "Fix", y: 0, tone: "stable" },
+  { label: "Add", y: 0, tone: "stable" },
+  { label: "Add", y: 0, tone: "stable" },
+  { label: "Fix", y: 0, tone: "stable" },
+  { label: "Add", y: 0, tone: "stable" },
+  { label: "Break", y: -4, tone: "break", strength: 1 },
+  { label: "Fix", y: 0, tone: "stable" },
+  { label: "Break", y: 10, tone: "break", strength: 2 },
+  { label: "Break", y: -12, tone: "break", strength: 3 },
+  { label: "Break", y: 16, tone: "break", strength: 4 }
 ];
 
 const toolNames = ["Claude", "Codex", "Cursor", "Antigravity"];
@@ -168,8 +166,7 @@ function SceneOne({ localStage }: SceneRenderProps) {
                     item.tone === "break" ? `sequence-item-break sequence-item-break-${item.strength}` : "sequence-item-stable"
                   ].join(" ")}
                   style={{
-                    left: item.x,
-                    top: item.y
+                    marginTop: item.y
                   }}
                 >
                   <span>{item.label}</span>
@@ -181,8 +178,7 @@ function SceneOne({ localStage }: SceneRenderProps) {
                     y={0}
                     className="sequence-arrow"
                     style={{
-                      left: getSequenceArrowLeft(item, sequenceItems[index + 1]),
-                      top: getSequenceArrowTop(item, sequenceItems[index + 1])
+                      marginTop: getSequenceArrowTop(item, sequenceItems[index + 1])
                     }}
                   >
                     <span>→</span>
@@ -1254,13 +1250,6 @@ function growthNodes(aligned: boolean) {
     { cx: 136, cy: 346, r: 14, className: "diagram-node diagram-node-break-soft" },
     { cx: 468, cy: 308, r: 14, className: "diagram-node diagram-node-break" }
   ];
-}
-
-function getSequenceArrowLeft(current: SequenceItem, next: SequenceItem) {
-  const gapStart = current.x + current.width;
-  const gapWidth = next.x - gapStart;
-
-  return gapStart + gapWidth / 2 - 16;
 }
 
 function getSequenceArrowTop(current: SequenceItem, next: SequenceItem) {

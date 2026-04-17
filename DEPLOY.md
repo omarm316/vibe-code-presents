@@ -1,7 +1,5 @@
 # Cloudflare Pages Deployment
 
-This project can be published the same way as `/Users/assaf/Documents/Apps/chef-reem`:
-
 - build static files into `dist/`
 - use a `wrangler.jsonc` file with `pages_build_output_dir`
 - deploy with `wrangler pages deploy`
@@ -9,9 +7,7 @@ This project can be published the same way as `/Users/assaf/Documents/Apps/chef-
 
 ## Recommended Mode
 
-Use **Cloudflare Pages Direct Upload with CI**, not Cloudflare's Git-integrated build flow.
-
-That matches `chef-reem` and keeps deployment under this repo's control via Wrangler and GitHub Actions.
+Use **Cloudflare Pages Direct Upload with CI**, not Cloudflare's Git-integrated build flow. Keep deployment under this repo's control via Wrangler and GitHub Actions.
 
 ## Why This Fits This Repo
 
@@ -64,8 +60,6 @@ Because this project uses Vite and TypeScript, the workflow includes:
 - `npm ci`
 - `npm run build`
 - `wrangler pages deploy dist --project-name=vibe-code-presents --branch=${{ github.ref_name }}`
-
-This is the same overall pattern as `chef-reem`, with the extra dependency install step required for this repo.
 
 ## If You Want A Different Project Name
 
