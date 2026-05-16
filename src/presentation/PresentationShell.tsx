@@ -116,6 +116,14 @@ export function PresentationShell() {
       role="application"
       aria-label="Continuous presentation"
     >
+      <a
+        className="pii-townhall-link"
+        href="/pii_townhall_v8.html"
+        onClick={(event) => event.stopPropagation()}
+      >
+        Open PII Town Hall deck
+      </a>
+
       <div className="presentation-ambient">
         <div className="ambient-glow ambient-glow-left" />
         <div className="ambient-glow ambient-glow-right" />

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PII Finance Town Hall | From Content Creation to Tool Building</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --navy-950: #061323;
+      --navy-900: #0a1d33;
+      --navy-800: #0d2b4d;
+      --blue-600: #1f6feb;
+      --blue-400: #54a3ff;
+      --teal-400: #2dd4bf;
+      --teal-300: #7dd3fc;
+      --gold-500: #d7a73f;
+      --gold-300: #f6d98b;
+      --slate-200: #dbe7f6;
+      --slate-400: #89a3bd;
+      --white: #ffffff;
+      --glass: rgba(255, 255, 255, 0.075);
+      --glass-strong: rgba(255, 255, 255, 0.13);
+      --line: rgba(255, 255, 255, 0.16);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.36);
+    }
+
+    * { box-sizing: border-box; }
+    html, body, #root { height: 100%; margin: 0; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 20% 10%, rgba(31, 111, 235, 0.35), transparent 32%),
+                  radial-gradient(circle at 78% 20%, rgba(215, 167, 63, 0.22), transparent 26%),
+                  linear-gradient(135deg, #04111f 0%, #081b31 45%, #061323 100%);
+      color: var(--white);
+      overflow: hidden;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    .deck {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .ambient {
+      position: absolute;
+      inset: -20%;
+      z-index: -2;
+      background:
+        radial-gradient(circle at var(--x, 35%) var(--y, 25%), rgba(84, 163, 255, 0.25), transparent 24rem),
+        radial-gradient(circle at 75% 75%, rgba(45, 212, 191, 0.15), transparent 22rem),
+        radial-gradient(circle at 12% 88%, rgba(215, 167, 63, 0.13), transparent 18rem);
+      filter: blur(4px);
+      transform: translateZ(0);
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.32;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(32px, 5vw, 76px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(40px) scale(0.985);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+
+    .slide-inner {
+      width: min(1220px, 100%);
+      height: min(730px, calc(100vh - 150px));
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gold-300);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 42px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold-500), transparent);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 {
+      font-size: clamp(4rem, 8vw, 7.3rem);
+      line-height: 0.91;
+      letter-spacing: -0.075em;
+      max-width: 1050px;
+      margin-top: 24px;
+    }
+    h2 {
+      font-size: clamp(2.4rem, 5vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      max-width: 1000px;
+      margin-top: 18px;
+    }
+    h3 {
+      font-size: clamp(1.15rem, 1.8vw, 1.65rem);
+      letter-spacing: -0.02em;
+    }
+    .gradient-text {
+      background: linear-gradient(100deg, #fff 5%, var(--blue-400) 40%, var(--teal-400) 65%, var(--gold-300) 95%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .subtitle {
+      margin-top: 28px;
+      max-width: 790px;
+      color: var(--slate-200);
+      font-size: clamp(1.25rem, 2.1vw, 1.78rem);
+      line-height: 1.35;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.045));
+      box-shadow: var(--shadow);
+      border-radius: 30px;
+      backdrop-filter: blur(18px);
+    }
+
+    .cover-orb {
+      position: absolute;
+      right: 2%;
+      top: 12%;
+      width: min(360px, 29vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 28%, rgba(255,255,255,0.85), transparent 9%),
+        radial-gradient(circle at 55% 45%, rgba(84,163,255,0.7), transparent 24%),
+        radial-gradient(circle at 67% 62%, rgba(45,212,191,0.45), transparent 24%),
+        linear-gradient(135deg, rgba(215,167,63,0.88), rgba(31,111,235,0.34));
+      filter: drop-shadow(0 45px 120px rgba(45, 212, 191, 0.2));
+      opacity: 0.9;
+    }
+
+    .cover-card {
+      position: absolute;
+      right: 8%;
+      bottom: 10%;
+      width: 330px;
+      padding: 22px;
+      transform: rotate(-2deg);
+    }
+    .mini-flow { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+    .mini-node {
+      width: 58px; height: 58px; border-radius: 18px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.09); border: 1px solid var(--line);
+      font-size: 1.35rem;
+    }
+    .mini-arrow { color: var(--gold-300); font-weight: 900; }
+
+    .hands-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 42px;
+    }
+    .hand-card {
+      min-height: 230px;
+      padding: 22px;
+      border-radius: 28px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+    }
+    .hand-card:hover { transform: translateY(-6px); border-color: rgba(246, 217, 139, 0.55); }
+    .hand-card.revealed { background: linear-gradient(145deg, rgba(45,212,191,0.17), rgba(31,111,235,0.10)); }
+    .hand-icon { font-size: 2.5rem; margin-bottom: 32px; }
+    .hand-number { position: absolute; right: 18px; top: 16px; color: rgba(255,255,255,0.26); font-size: 3.6rem; font-weight: 900; }
+    .pivot {
+      margin-top: 32px;
+      padding: 22px 28px;
+      display: inline-flex;
+      color: #061323;
+      background: linear-gradient(90deg, var(--gold-300), var(--teal-300));
+      border-radius: 999px;
+      font-size: clamp(1.1rem, 2vw, 1.55rem);
+      font-weight: 900;
+      box-shadow: 0 20px 70px rgba(125, 211, 252, 0.18);
+    }
+
+    .transition-stage {
+      display: grid;
+      grid-template-columns: 1fr 130px 1fr;
+      align-items: center;
+      gap: 18px;
+      margin-top: 44px;
+    }
+    .stack { display: grid; gap: 13px; }
+    .stack-title { color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.78rem; font-weight: 800; margin-bottom: 8px; }
+    .concept-pill {
+      display: flex; align-items: center; gap: 14px;
+      padding: 17px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--slate-200);
+    }
+    .concept-pill.tool { background: linear-gradient(90deg, rgba(45,212,191,0.14), rgba(31,111,235,0.13)); border-color: rgba(125,211,252,0.22); color: #fff; }
+    .concept-icon { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,255,255,0.08); }
+    .bridge {
+      height: 240px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .bridge-line { width: 115px; height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--gold-500), var(--teal-400)); position: relative; }
+    .bridge-line::after { content: ""; position: absolute; right: -9px; top: -7px; border-left: 18px solid var(--teal-400); border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
+    .bridge-label { position: absolute; top: 32px; text-align: center; color: var(--gold-300); font-weight: 900; letter-spacing: 0.03em; }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 34px;
+    }
+    .portfolio-tile {
+      min-height: 170px;
+      padding: 22px;
+      border-radius: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .portfolio-tile::after {
+      content: ""; position: absolute; inset: auto -30% -45% 30%; height: 110px; background: rgba(84,163,255,0.22); filter: blur(34px);
+    }
+    .tag { display: inline-flex; padding: 7px 10px; border-radius: 999px; background: rgba(215,167,63,0.17); color: var(--gold-300); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 900; margin-bottom: 20px; }
+    .built-note { margin-top: 22px; color: var(--teal-300); font-size: 1.24rem; font-weight: 800; }
+
+    .framework-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 52px; }
+    .framework-card { padding: 30px; min-height: 260px; border-radius: 32px; position: relative; overflow: hidden; }
+    .framework-card strong { font-size: 4.3rem; color: rgba(255,255,255,0.08); position: absolute; right: 24px; bottom: 4px; letter-spacing: -0.08em; }
+    .framework-card h3 { color: var(--gold-300); font-size: 2rem; margin-bottom: 20px; }
+    .framework-card p { color: var(--slate-200); font-size: 1.35rem; line-height: 1.36; }
+    .mantra { margin-top: 36px; text-align: center; font-size: clamp(1.3rem, 2.3vw, 2.1rem); font-weight: 900; color: #061323; padding: 18px; border-radius: 24px; background: linear-gradient(90deg, var(--gold-300), var(--teal-300)); }
+
+    .prompt-layout { display: grid; grid-template-columns: 0.88fr 1.35fr; gap: 22px; align-items: stretch; margin-top: 24px; min-height: 535px; }
+    .prompt-card { padding: 24px; border-radius: 30px; display: flex; flex-direction: column; }
+    .prompt-box {
+      margin-top: 22px;
+      padding: 22px;
+      border-radius: 22px;
+      background: #07192d;
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      color: #e9f6ff;
+      font-size: 1.18rem;
+      line-height: 1.48;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .mock-disclaimer { margin-top: auto; padding-top: 22px; color: var(--gold-300); font-weight: 800; font-size: 0.98rem; }
+
+    .app-window { border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16); background: #eef5fb; color: #0b1f35; box-shadow: 0 35px 110px rgba(0,0,0,0.38); }
+    .window-bar { height: 42px; background: linear-gradient(90deg, #09203a, #0d355d); display: flex; align-items: center; gap: 8px; padding: 0 17px; color: #cfe4fa; font-size: 0.82rem; font-weight: 800; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: #ff6b6b; } .dot:nth-child(2){ background:#ffd166; } .dot:nth-child(3){ background:#2dd4bf; margin-right: 10px; }
+    .app-body { padding: 18px; display: grid; gap: 14px; }
+    .search { background: white; border: 1px solid #d2deea; border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; color: #61758b; box-shadow: 0 8px 22px rgba(13,43,77,0.08); }
+    .metric-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
+    .metric-card { padding: 12px; border-radius: 16px; background: white; border: 1px solid #dbe6f1; min-height: 88px; }
+    .metric-card b { display: block; color: #09203a; font-size: 1rem; margin-bottom: 7px; }
+    .metric-card span { color: #60758a; font-size: 0.78rem; line-height: 1.25; }
+    .app-lower { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 14px; }
+    .comparison, .qa-panel, .timeline, .japan-tile { background: white; border: 1px solid #dbe6f1; border-radius: 18px; padding: 14px; }
+    .comparison h4, .qa-panel h4, .timeline h4 { margin: 0 0 12px; color: #09203a; }
+    .compare-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .compare-box { background: #f4f8fc; border-radius: 14px; padding: 12px; min-height: 112px; }
+    .compare-box b { color: #0d355d; }
+    .compare-box p { color: #60758a; font-size: 0.82rem; line-height: 1.28; margin-top: 8px; }
+    .question { background: #f2f7fc; border: 1px solid #d8e5f1; border-radius: 14px; padding: 12px; color: #314b63; font-size: 0.9rem; }
+    .answer { margin-top: 10px; border-left: 4px solid #2dd4bf; padding: 10px 12px; background: #f8fcff; color: #1a354f; font-size: 0.85rem; line-height: 1.35; }
+    .timeline { margin-top: 14px; }
+    .event { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid #edf2f7; font-size: 0.82rem; color: #536b82; }
+    .event:first-of-type { border-top: 0; }
+    .event b { color: #0d355d; }
+    .japan-tile { margin-top: 14px; background: linear-gradient(135deg, #fff, #edf7ff); display: flex; justify-content: space-between; align-items: center; }
+    .badge-blue { padding: 7px 9px; border-radius: 999px; background: #dff3ff; color: #0d5783; font-size: 0.72rem; font-weight: 900; }
+
+    .validator-layout { display: grid; grid-template-columns: 0.88fr 1.12fr; gap: 24px; margin-top: 34px; }
+    .upload-zone { height: 250px; display: grid; place-items: center; text-align: center; border: 2px dashed rgba(125,211,252,0.38); border-radius: 28px; background: rgba(255,255,255,0.06); }
+    .validator-screen { background: #f2f7fb; color: #0b1f35; border-radius: 30px; padding: 20px; box-shadow: var(--shadow); }
+    .summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .summary-box { background: white; border-radius: 16px; padding: 14px; border: 1px solid #dce7f2; }
+    .summary-box b { display: block; font-size: 1.35rem; color: #0d355d; }
+    .error-table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 16px; background: white; font-size: 0.86rem; }
+    .error-table th, .error-table td { padding: 11px 12px; border-bottom: 1px solid #e8eef5; text-align: left; }
+    .error-table th { color: #60758a; background: #f8fbfe; }
+    .download { margin-top: 15px; border: 0; border-radius: 999px; background: linear-gradient(90deg, #0d65bd, #2dd4bf); color: white; padding: 13px 20px; font-weight: 900; }
+
+    .close-slide { text-align: center; align-items: center; }
+    .big-question { font-size: clamp(4rem, 9vw, 8.4rem); line-height: 0.9; letter-spacing: -0.075em; margin: 28px 0; }
+    .closing-line { max-width: 920px; margin: 26px auto 0; color: var(--slate-200); font-size: clamp(1.3rem, 2.2vw, 2rem); line-height: 1.35; }
+
+    .nav {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      bottom: 22px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 22px;
+      z-index: 20;
+    }
+    .nav-buttons { display: flex; gap: 10px; }
+    .nav button {
+      width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line);
+      color: white; background: rgba(255,255,255,0.08); cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    .nav button:hover { transform: translateY(-2px); background: rgba(255,255,255,0.15); }
+    .progress-track { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.13); overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-500), var(--blue-400), var(--teal-400)); border-radius: inherit; transition: width 350ms ease; }
+    .slide-count { color: var(--slate-400); font-weight: 800; letter-spacing: 0.08em; }
+    .hint { position: absolute; right: 34px; top: 24px; color: rgba(255,255,255,0.45); font-size: 0.82rem; z-index: 10; }
+
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .deck { min-height: 100%; }
+      .slide { position: relative; min-height: 100vh; padding: 26px; display: none; }
+      .slide.active { display: grid; }
+      .slide-inner { height: auto; min-height: calc(100vh - 150px); }
+      .hands-grid, .portfolio-grid, .framework-row, .transition-stage, .prompt-layout, .validator-layout { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .app-lower { grid-template-columns: 1fr; }
+      .cover-orb, .cover-card { display: none; }
+      .nav { position: fixed; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useEffect, useRef, useState } = React;
+
+    // -------------------------------------------------------------------------
+    // MOCK DATA EDITING AREA
+    // All metrics, timelines, portfolio tiles, and validator examples below are
+    // intentionally mock data only. Replace these arrays to customize the deck.
+    // -------------------------------------------------------------------------
+    const metricCards = [
+      { name: "AOI", desc: "Adjusted operating income lens for management views." },
+      { name: "GAAP Income", desc: "Reported accounting view with standard presentation." },
+      { name: "USDF", desc: "Mock distribution-focused measure for planning context." },
+      { name: "USDC", desc: "Mock capital/cash metric placeholder for examples." },
+      { name: "ESR", desc: "Scenario-sensitive ratio used here as demo content." },
+      { name: "FX Impact", desc: "Illustrative currency movement effect on results." }
+    ];
+
+    const recentEvents = [
+      { date: "May", text: "Quarterly close: metric definitions refreshed for new users." },
+      { date: "Jun", text: "Planning cycle: scenario questions increased across teams." },
+      { date: "Jul", text: "Mock dashboard release: comparison examples expanded." }
+    ];
+
+    const portfolioTiles = [
+      { label: "Personal", title: "Personal finance management app", detail: "Spreadsheet logic reimagined as a desktop / mobile app." },
+      { label: "Personal", title: "Healthcare monitor", detail: "Prototype to organize EOBs, deductible progress, and claims data." },
+      { label: "Work", title: "Transformation project tracker", detail: "Gantt-style view for milestones, owners, status, and dependencies." },
+      { label: "Work", title: "ESR sensitivity tool", detail: "Scenario interface for assumptions, sensitivities, and explainability." },
+      { label: "Work", title: "AOI sensitivity prototype", detail: "Mock planning lens to explore drivers and bridge changes." },
+      { label: "Meta", title: "This presentation", detail: "The deck itself was shaped, refactored, and polished with AI assistance." }
+    ];
+
+    const validatorRows = [
+      ["Revenue_Forecast_JP.xlsx", "Missing field", "Business Area"],
+      ["Forecast_Load_Q3.csv", "Invalid currency", "XYZ"],
+      ["Plan_Adjustments.csv", "Duplicate row", "Account 4100"],
+      ["Expense_Detail.xlsx", "Unmapped account", "Account 7788"]
+    ];
+
+    const slides = [
+      {
+        key: "cover",
+        render: () => <CoverSlide />
+      },
+      {
+        key: "hands",
+        render: () => <HandsSlide />
+      },
+      {
+        key: "transition",
+        render: () => <TransitionSlide />
+      },
+      {
+        key: "portfolio",
+        render: () => <PortfolioSlide />
+      },
+      {
+        key: "framework",
+        render: () => <FrameworkSlide />
+      },
+      {
+        key: "decoder",
+        render: () => <BusinessExplorerSlide />
+      },
+      {
+        key: "validator",
+        render: () => <ValidatorSlide />
+      },
+      {
+        key: "close",
+        render: () => <CloseSlide />
+      }
+    ];
+
+    function CoverSlide() {
+      return (
+        <div className="slide-inner">
+          <div className="cover-orb animate-float" />
+          <div className="eyebrow animate-in">PII Finance Town Hall · June 2026</div>
+          <h1 className="animate-in">From Content Creation to <span className="gradient-text">Tool Building</span></h1>
+          <p className="subtitle animate-in">Using AI to build apps, calculators, trackers, and knowledge tools.</p>
+          <div className="cover-card panel animate-in">
+            <h3>Finance + AI</h3>
+            <div className="mini-flow">
+              <div className="mini-node">✍️</div><div className="mini-arrow">→</div>
+              <div className="mini-node">🧭</div><div className="mini-arrow">→</div>
+              <div className="mini-node">🛠️</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function HandsSlide() {
+      const [revealed, setRevealed] = useState({});
+      const questions = [
+        ["✉️", "Used AI to write or rewrite an email?"],
+        ["📄", "Used AI to summarize a meeting or document?"],
+        ["📊", "Used AI to help with PowerPoint?"],
+        ["ƒx", "Used AI with Excel or formulas?"],
+        ["🛠️", "Used AI to build an app, calculator, dashboard, tracker, or tool?"]
+      ];
+      const allRevealed = Object.keys(revealed).length >= questions.length;
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">Audience interaction</div>
+          <h2 className="animate-in">Quick show of hands</h2>
+          <div className="hands-grid">
+            {questions.map(([icon, text], index) => (
+              <button key={text} className={`hand-card panel animate-in ${revealed[index] ? "revealed" : ""}`} onClick={() => setRevealed({ ...revealed, [index]: true })}>
+                <div className="hand-number">{index + 1}</div>
+                <div className="hand-icon">{icon}</div>
+                <h3>{text}</h3>
+              </button>
+            ))}
+          </div>
+          <div className="pivot animate-in" style={{ opacity: allRevealed ? 1 : 0.22 }}>
+            Today I want to focus on that last category.
+          </div>
+        </div>
+      );
+    }
+
+    function TransitionSlide() {
+      const content = ["Email", "Summary", "Presentation", "Search", "Excel help"];
+      const tools = ["App", "Calculator", "Tracker", "Validator", "Dashboard", "Knowledge hub"];
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">The pivot</div>
+          <h2 className="animate-in">From content creation <span className="gradient-text">to tool building</span></h2>
+          <div className="transition-stage">
+            <div>
+              <div className="stack-title animate-in">Common starting points</div>
+              <div className="stack">{content.map((item, i) => <div className="concept-pill animate-left" key={item}><span className="concept-icon">{["✉️","📝","📊","🔎","ƒx"][i]}</span>{item}</div>)}</div>
+            </div>
+            <div className="bridge animate-in"><div className="bridge-label">AI as builder</div><div className="bridge-line" /></div>
+            <div>
+              <div className="stack-title animate-in">Higher leverage outcomes</div>
+              <div className="stack">{tools.map((item, i) => <div className="concept-pill tool animate-right" key={item}><span className="concept-icon">{["🧩","🧮","✅","🛡️","📈","📚"][i]}</span>{item}</div>)}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function PortfolioSlide() {
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">Tools already built</div>
+          <h2 className="animate-in">A portfolio mindset: small tools that remove friction</h2>
+          <div className="portfolio-grid">
+            {portfolioTiles.map(tile => (
+              <div className="portfolio-tile panel animate-in" key={tile.title}>
+                <span className="tag">{tile.label}</span>
+                <h3>{tile.title}</h3>
+                <p className="subtitle" style={{fontSize: "1.02rem", marginTop: 12}}>{tile.detail}</p>
+              </div>
+            ))}
+          </div>
+          <div className="built-note animate-in">This presentation itself was built with AI.</div>
+        </div>
+      );
+    }
+
+    function FrameworkSlide() {
+      const cards = [
+        ["01", "IMAGINE", "What pain point deserves a better tool?"],
+        ["02", "EXPLORE", "What kind of tool could solve it?"],
+        ["03", "BUILD", "Can AI help prototype it?"]
+      ];
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">A practical framework</div>
+          <h2 className="animate-in">Move from idea to working prototype</h2>
+          <div className="framework-row">
+            {cards.map(([num, title, text]) => <div className="framework-card panel animate-in" key={title}><strong>{num}</strong><h3>{title}</h3><p>{text}</p></div>)}
+          </div>
+          <div className="mantra animate-in">Imagine the better workflow. Explore the right tool. Build a prototype.</div>
+        </div>
+      );
+    }
+
+    function BusinessExplorerSlide() {
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">Building together · prompt to prototype</div>
+          <h2 className="animate-in">PII Business Explorer / Metric Decoder</h2>
+          <div className="prompt-layout">
+            <div className="prompt-card panel animate-in">
+              <h3>Prompt</h3>
+              <div className="prompt-box">“Build a simple web app that helps Finance users understand PII metrics and business areas. Include a search bar, metric cards, side-by-side comparisons, examples, recent events, and an ‘ask a question’ box. Use mock data only.”</div>
+              <div className="mock-disclaimer">Mock data only · Designed as a learning prototype · No confidential Prudential or PII data</div>
+            </div>
+            <MetricDecoderMock />
+          </div>
+        </div>
+      );
+    }
+
+    function MetricDecoderMock() {
+      return (
+        <div className="app-window animate-in">
+          <div className="window-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span> Metric Decoder · prototype</div>
+          <div className="app-body">
+            <div className="search"><span>🔎 Search metric, business area, or event...</span><b>Mock results</b></div>
+            <div className="metric-grid">
+              {metricCards.map(metric => <div className="metric-card" key={metric.name}><b>{metric.name}</b><span>{metric.desc}</span></div>)}
+            </div>
+            <div className="app-lower">
+              <div>
+                <div className="comparison">
+                  <h4>Side-by-side comparison</h4>
+                  <div className="compare-columns">
+                    <div className="compare-box"><b>AOI</b><p>Management-oriented operating lens for recurring performance discussion.</p></div>
+                    <div className="compare-box"><b>GAAP Income</b><p>Reported income view following accounting presentation and required disclosures.</p></div>
+                  </div>
+                </div>
+                <div className="timeline">
+                  <h4>Recent events / business context</h4>
+                  {recentEvents.map(event => <div className="event" key={event.date + event.text}><b>{event.date}</b><span>{event.text}</span></div>)}
+                </div>
+              </div>
+              <div>
+                <div className="qa-panel">
+                  <h4>Ask a question</h4>
+                  <div className="question">What is the difference between AOI and GAAP income?</div>
+                  <div className="answer"><b>Mock answer:</b> AOI can help isolate operating performance for management analysis, while GAAP income is the reported accounting measure. A Finance user would review both, depending on the question being answered.</div>
+                </div>
+                <div className="japan-tile">
+                  <div><b>Japan business tile</b><p style={{marginTop: 6, color: "#60758a", fontSize: ".84rem"}}>Mock region context, metric glossary, and example drivers.</p></div>
+                  <span className="badge-blue">Optional</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ValidatorSlide() {
+      return (
+        <div className="slide-inner">
+          <div className="eyebrow animate-in">Optional second prototype</div>
+          <h2 className="animate-in">Forecast File Validator</h2>
+          <div className="validator-layout">
+            <div className="prompt-card panel animate-in">
+              <h3>Prompt</h3>
+              <div className="prompt-box">“Build a web app that lets a Finance user upload a forecast file, checks for missing fields, invalid currencies, duplicates, and unmapped accounts, then displays and downloads an exception report. Use mock data only.”</div>
+              <div className="upload-zone"><div><div style={{fontSize: "3rem"}}>⬆️</div><h3>Drop forecast file</h3><p className="subtitle" style={{fontSize: "1rem", marginTop: 8}}>Mock upload area · CSV / XLSX</p></div></div>
+            </div>
+            <div className="validator-screen animate-in">
+              <div className="summary-strip">
+                <div className="summary-box"><b>17</b><span>Issues found</span></div>
+                <div className="summary-box"><b>4</b><span>Categories</span></div>
+                <div className="summary-box"><b>2</b><span>Files checked</span></div>
+                <div className="summary-box"><b>0</b><span>Data sent</span></div>
+              </div>
+              <table className="error-table">
+                <thead><tr><th>File</th><th>Category</th><th>Example</th></tr></thead>
+                <tbody>{validatorRows.map(row => <tr key={row.join("|")}>{row.map(cell => <td key={cell}>{cell}</td>)}</tr>)}</tbody>
+              </table>
+              <button className="download">Download exception report</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function CloseSlide() {
+      return (
+        <div className="slide-inner close-slide">
+          <div className="eyebrow animate-in">Recap</div>
+          <div className="framework-row" style={{width: "100%", marginTop: 28}}>
+            {[["IMAGINE", "Pain point"], ["EXPLORE", "Tool pattern"], ["BUILD", "Prototype"]].map(([a,b]) => <div className="framework-card panel animate-in" style={{minHeight: 150}} key={a}><h3>{a}</h3><p>{b}</p></div>)}
+          </div>
+          <div className="big-question gradient-text animate-in">What will you build?</div>
+          <p className="closing-line animate-in">AI will not replace Finance judgment. But it can help us turn Finance judgment into better tools.</p>
+        </div>
+      );
+    }
+
+    function Deck() {
+      const [index, setIndex] = useState(0);
+      const slideRefs = useRef([]);
+      const percent = ((index + 1) / slides.length) * 100;
+
+      const goTo = (next) => setIndex(Math.max(0, Math.min(slides.length - 1, next)));
+
+      useEffect(() => {
+        const onKey = (event) => {
+          if (["ArrowRight", "PageDown", " "].includes(event.key)) goTo(index + 1);
+          if (["ArrowLeft", "PageUp"].includes(event.key)) goTo(index - 1);
+          if (event.key === "Home") goTo(0);
+          if (event.key === "End") goTo(slides.length - 1);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+      }, [index]);
+
+      useEffect(() => {
+        const active = slideRefs.current[index];
+        if (!active || !window.gsap) return;
+        gsap.fromTo(active.querySelectorAll(".animate-in"), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.72, stagger: 0.08, ease: "power3.out" });
+        gsap.fromTo(active.querySelectorAll(".animate-left"), { x: -38, opacity: 0 }, { x: 0, opacity: 1, duration: 0.78, stagger: 0.08, ease: "power3.out" });
+        gsap.fromTo(active.querySelectorAll(".animate-right"), { x: 38, opacity: 0 }, { x: 0, opacity: 1, duration: 0.78, stagger: 0.08, ease: "power3.out" });
+        gsap.to(active.querySelectorAll(".animate-float"), { y: -16, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
+      }, [index]);
+
+      useEffect(() => {
+        const onMove = (event) => {
+          document.documentElement.style.setProperty("--x", `${(event.clientX / window.innerWidth) * 100}%`);
+          document.documentElement.style.setProperty("--y", `${(event.clientY / window.innerHeight) * 100}%`);
+        };
+        window.addEventListener("mousemove", onMove);
+        return () => window.removeEventListener("mousemove", onMove);
+      }, []);
+
+      return (
+        <main className="deck" aria-label="PII Finance Town Hall presentation">
+          <div className="ambient" />
+          <div className="grid-bg" />
+          <div className="hint">Use ← / → keys</div>
+          {slides.map((slide, i) => (
+            <section key={slide.key} ref={el => slideRefs.current[i] = el} className={`slide ${i === index ? "active" : ""}`} aria-hidden={i !== index}>
+              {slide.render()}
+            </section>
+          ))}
+          <nav className="nav" aria-label="Slide navigation">
+            <div className="nav-buttons">
+              <button onClick={() => goTo(index - 1)} aria-label="Previous slide">←</button>
+              <button onClick={() => goTo(index + 1)} aria-label="Next slide">→</button>
+            </div>
+            <div className="progress-track" aria-hidden="true"><div className="progress-fill" style={{ width: `${percent}%` }} /></div>
+            <div className="slide-count">{String(index + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}</div>
+          </nav>
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<Deck />);
+  </script>
+</body>
+</html>

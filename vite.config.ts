@@ -62,5 +62,13 @@ function rootAssetsPlugin() {
 }
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        piiTownHall: path.resolve(__dirname, "pii_townhall_v8.html")
+      }
+    }
+  },
   plugins: [react(), rootAssetsPlugin()]
 });
