@@ -522,3 +522,23 @@ Turn the plan into scene files.
 Then let Codex build the presentation from that plan.
 
 That is the core habit behind vibe coding a presentation that still feels organized and easy to improve.
+
+## PII Finance Town Hall Deck
+
+The June 2026 PII Finance Town Hall presentation is a standalone, single-file deck at:
+
+- [`pii_townhall_v8.html`](./pii_townhall_v8.html)
+
+To run it locally without any build system:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open:
+
+```text
+http://localhost:8000/pii_townhall_v8.html
+```
+
+If you are using the Vite app instead, run `npm run dev` and open the same `/pii_townhall_v8.html` path on the Vite dev server. The Vite build is configured to include this standalone HTML file in `dist/` so it is also available at `/pii_townhall_v8.html` after deployment.
